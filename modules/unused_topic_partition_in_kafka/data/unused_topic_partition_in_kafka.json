@@ -1,0 +1,150 @@
+{
+  "name": "unused_topic_partition_in_kafka",
+  "description": "This incident type refers to the detection of an unused topic partition in Kafka Platform, a popular data streaming platform. Unused partitions can increase broker overhead and reduce efficiency, so it is recommended to delete them. The incident is triggered by a test notification or a monitoring query that checks the value of relevant metrics. The incident is resolved once the partition is deleted or confirmed to be intentional.",
+  "params": [
+    {
+      "name": "NUMBER_OF_THE_PARTITION",
+      "value": ""
+    },
+    {
+      "name": "TOPIC_NAME",
+      "value": ""
+    },
+    {
+      "name": "ZOOKEEPER_CONNECTION_STRING",
+      "value": ""
+    },
+    {
+      "name": "PARTITION_DIRECTORY",
+      "value": ""
+    },
+    {
+      "name": "CONSUMER_GROUP",
+      "value": ""
+    },
+    {
+      "name": "KAFKA_BOOTSTRAP_SERVER",
+      "value": ""
+    },
+    {
+      "name": "PARTITION_NUMBER",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Unused Topic Partition in Kafka\nThis incident type refers to the detection of an unused topic partition in Kafka Platform, a popular data streaming platform. Unused partitions can increase broker overhead and reduce efficiency, so it is recommended to delete them. The incident is triggered by a test notification or a monitoring query that checks the value of relevant metrics. The incident is resolved once the partition is deleted or confirmed to be intentional."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if the topic exists in the Kafka cluster"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `kafka-topics.sh --bootstrap-server ${KAFKA_BOOTSTRAP_SERVER} --describe --topic ${TOPIC_NAME}`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if the partition is marked as \"unused\""
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `kafka-log-dirs.sh --describe --topic-list ${TOPIC_NAME} --bootstrap-server ${KAFKA_BOOTSTRAP_SERVER} | grep -A 2 \"${PARTITION_NUMBER}\"`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the disk usage for the partition directory"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `du -sh ${PARTITION_DIRECTORY}`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the broker overhead for the partition"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `kafka-consumer-groups.sh --bootstrap-server ${KAFKA_BOOTSTRAP_SERVER} --describe --group ${CONSUMER_GROUP} --topic ${TOPIC_NAME}`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the status of the Kafka brokers"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `kafka-broker-api-versions.sh --bootstrap-server ${KAFKA_BOOTSTRAP_SERVER}`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the status of the ZooKeeper nodes"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `zkCli.sh -server $ZOOKEEPER_CONNECTION_STRING ls /brokers/ids`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Delete the unused topic partition if it's no longer needed. You can use the Kafka command line tool to delete the topic partition."
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_delete_topic_partition($NUMBER_OF_THE_PARTITION, $TOPIC_NAME, $ZOOKEEPER_CONNECTION_STRING)"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## exit 0"
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | ``"
+    }
+  ]
+}
