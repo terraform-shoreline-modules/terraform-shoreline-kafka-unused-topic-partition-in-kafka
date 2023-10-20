@@ -3,7 +3,7 @@
   "description": "This incident type refers to the detection of an unused topic partition in Kafka Platform, a popular data streaming platform. Unused partitions can increase broker overhead and reduce efficiency, so it is recommended to delete them. The incident is triggered by a test notification or a monitoring query that checks the value of relevant metrics. The incident is resolved once the partition is deleted or confirmed to be intentional.",
   "params": [
     {
-      "name": "NUMBER_OF_THE_PARTITION",
+      "name": "PARTITION_DIRECTORY",
       "value": ""
     },
     {
@@ -11,11 +11,11 @@
       "value": ""
     },
     {
-      "name": "ZOOKEEPER_CONNECTION_STRING",
+      "name": "KAFKA_BOOTSTRAP_SERVER",
       "value": ""
     },
     {
-      "name": "PARTITION_DIRECTORY",
+      "name": "NUMBER_OF_THE_PARTITION",
       "value": ""
     },
     {
@@ -23,11 +23,11 @@
       "value": ""
     },
     {
-      "name": "KAFKA_BOOTSTRAP_SERVER",
+      "name": "PARTITION_NUMBER",
       "value": ""
     },
     {
-      "name": "PARTITION_NUMBER",
+      "name": "ZOOKEEPER_CONNECTION_STRING",
       "value": ""
     },
     {
@@ -132,19 +132,7 @@
       "name": "cell_15",
       "type": "OP_LANG",
       "enabled": true,
-      "content": "host | host_name=$HOST_NAME | invoke_delete_topic_partition($NUMBER_OF_THE_PARTITION, $TOPIC_NAME, $ZOOKEEPER_CONNECTION_STRING)"
-    },
-    {
-      "name": "cell_16",
-      "type": "MARKDOWN",
-      "enabled": true,
-      "content": "## exit 0"
-    },
-    {
-      "name": "cell_17",
-      "type": "OP_LANG",
-      "enabled": true,
-      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | ``"
+      "content": "host | host_name=$HOST_NAME | invoke_delete_topic_partition($TOPIC_NAME, $NUMBER_OF_THE_PARTITION, $ZOOKEEPER_CONNECTION_STRING)"
     }
   ]
 }
